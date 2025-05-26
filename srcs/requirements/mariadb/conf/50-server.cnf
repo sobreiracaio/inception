@@ -1,0 +1,40 @@
+[server]
+
+[mysqld]
+
+#defines which user runs the mysqld process
+user = root 
+
+#file in which the system keep the process ID(PID) of mariadb server, used to control the db process
+pid-file = /run/mysqld/mysqld.pid 
+
+#base directory in which mariadb is installed
+basedir = /usr
+
+#directory where the db file are located
+datadir = /var/lib/mysql
+
+#directory for temp data
+tmpdir = /tmp
+
+#directory where translated messages are kept
+lc-messages-dir = /usr/share/mysql
+
+#setup mariadb to show message errors in english
+
+lc-messages = en_US
+
+#the db is going to listen to any ip instead of only localhost in order to make possible to other services to connect to it(like wordpress for example)
+bind-address = 0.0.0.0
+
+#defines the char setup for the db, in this case utf8 is the best practice for wordpress
+
+character-set-server = utf8mb4
+collation-server = utf8mb4_general_ci
+
+[embedded]
+
+[mariadb]
+
+[mariadb-10.5]
+
