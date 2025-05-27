@@ -1,45 +1,60 @@
-#version: "3.9"
+
+
 
 services:
   mariadb:
-    build: ./requirements/mariadb
     container_name: mariadb
+    build: ./requirements/mariadb
+    expose:
+      - "3306"
     restart: always
-    env_file: .env
+    env_file:
+      - .env
     volumes:
-      - db_data:/var/lib/mysql
+      - mariadb_data:/var/lib/mysql
     networks:
-      - inception
-   
+      inception:
+  
   wordpress:
-    build: ./requirements/wordpress
     container_name: wordpress
+    build: ./requirements/wordpress
+    expose:
+      - "9000"
     restart: always
-    env_file: .env
-    depends_on:
-      - mariadb
+    env_file:
+      - .env
     volumes:
-      - wp_data:/var/www/html
+      - wordpress_data:/var/www/html
     networks:
-      - inception
-   
+      inception:
+
   nginx:
-    build: ./requirements/nginx
     container_name: nginx
-    restart: always
+    build: ./requirements/nginx
     ports:
       - "443:443"
     depends_on:
       - wordpress
     volumes:
-      - wp_data:/var/www/html  
+      - wordpress_data:/var/www/html
     networks:
-      - inception
+      inception:
+    restart: always
 
 volumes:
-  db_data:
-  wp_data:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/crocha-s/data/mariadb
+      o: bind
+  wordpress_data:
+    driver: local
+    driver_opts:
+      device: /home/crocha-s/data/wp_db
+      o: bind
+      type: none
 
 networks:
   inception:
-
+    driver: bridge

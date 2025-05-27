@@ -1,28 +1,19 @@
 #!/bin/bash
 
-# Grants the right permissions in the volume
 chown -R mysql:mysql /var/lib/mysql
 
-# Initialize db if it is empty
 if [ ! "$(ls -A /var/lib/mysql)" ]; then
-    mariadb-install-db > /dev/null
+	mariadb-install-db
 fi
 
-# Initialize MariaDB on background
-mysqld_safe & sleep 5
-
-# Execute SQL commands on root
+mysqld_safe & sleep 1
 mysql -u root -e "
-    CREATE DATABASE IF NOT EXISTS ${MARIADB_DATABASE};
-    DROP USER IF EXISTS '${MARIADB_USER}'@'%';
-    CREATE USER '${MARIADB_USER}'@'%' IDENTIFIED BY '${MARIADB_PASSWORD}';
-    GRANT ALL PRIVILEGES ON ${MARIADB_DATABASE}.* TO '${MARIADB_USER}'@'%' WITH GRANT OPTION;
-    FLUSH PRIVILEGES;
+				CREATE DATABASE IF NOT EXISTS ${DB_NAME};
+				DROP USER IF EXISTS '${DB_USER}'@'%';
+				CREATE USER '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';
+				GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%' WITH GRANT OPTION;
+				FLUSH PRIVILEGES;
 "
-
-# Ends the temporary processes
 mysqladmin -u root shutdown
 
-# Initializes db on foreground
 exec mysqld
-
