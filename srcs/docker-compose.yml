@@ -13,7 +13,7 @@ services:
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
-      inception:
+      - inception
   
   wordpress:
     container_name: wordpress
@@ -26,8 +26,9 @@ services:
     volumes:
       - wordpress_data:/var/www/html
     networks:
-      inception:
-
+      - inception
+    depends_on:
+      - mariadb
   nginx:
     container_name: nginx
     build: ./requirements/nginx
@@ -35,10 +36,11 @@ services:
       - "443:443"
     depends_on:
       - wordpress
+      - mariadb
     volumes:
       - wordpress_data:/var/www/html
     networks:
-      inception:
+      - inception
     restart: always
 
 volumes:

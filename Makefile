@@ -32,6 +32,8 @@ install:
 	@echo "\033[1;34mInstalling Docker engine and plugins...\033[0m"
 	@sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 	
+	@echo "127.0.0.1 crocha-s.42.fr" | sudo tee -a /etc/hosts
+
 	@echo "\033[1;32mDocker installation complete!\033[0m"
 
 mkdirs:
