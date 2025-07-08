@@ -1,19 +1,29 @@
 #!/bin/bash
 
-chown -R mysql:mysql /var/lib/mysql
+service mariadb start
 
-if [ ! "$(ls -A /var/lib/mysql)" ]; then
-	mariadb-install-db
-fi
+# WP database - creation and import
 
-mysqld_safe & sleep 1
 mysql -u root -e "
-				CREATE DATABASE IF NOT EXISTS ${DB_NAME};
-				DROP USER IF EXISTS '${DB_USER}'@'%';
-				CREATE USER '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';
-				GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%' WITH GRANT OPTION;
+				CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
+				CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+				GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';
 				FLUSH PRIVILEGES;
-"
-mysqladmin -u root shutdown
+		 "
 
-exec mysqld
+# Set Password for root user
+mariadb -u root -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$MYSQL_ROOT_PASSWORD');"
+mariadb -u root -e "FLUSH PRIVILEGES;"
+
+# Allow root user to login from any host
+mariadb -u root -p $MYSQL_ROOT_PASSWORD "GRANT ALL ON *.* TO 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';"
+mariadb -u root -p $MYSQL_ROOT_PASSWORD "FLUSH PRIVILEGES;"
+
+service mariadb stop
+
+
+
+
+
+
+

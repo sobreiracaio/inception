@@ -1,62 +1,33 @@
-
-
+#Services - Containers:
 
 services:
-  mariadb:
-    container_name: mariadb
-    build: ./requirements/mariadb
-    expose:
-      - "3306"
-    restart: always
-    env_file:
-      - .env
-    volumes:
-      - mariadb_data:/var/lib/mysql
+  mariadb:                                       #Service name used for internal communication between containers
+    container_name: mariadb                      #Container name already set up to avoid auto generated name
+    image: mariadb                               #Image name
+    init: true                                   #Uses init process from Docker to avoid zombie processes
+    build:
+      context: ./requirements/mariadb            #Dockerfile folder
+      args:                                      #Arguments passed during image build (from .env)
+        - MYSQL_DATABASE
+        - MYSQL_USER
+        - MYSQL_PASSWORD
+        - MYSQL_ROOT_PASSWORD
     networks:
-      - inception
-  
-  wordpress:
-    container_name: wordpress
-    build: ./requirements/wordpress
-    expose:
-      - "9000"
-    restart: always
-    env_file:
-      - .env
+      - inception                                #Network in which this container belongs (allows communication between services)
     volumes:
-      - wordpress_data:/var/www/html
-    networks:
-      - inception
-    depends_on:
-      - mariadb
-  nginx:
-    container_name: nginx
-    build: ./requirements/nginx
-    ports:
-      - "443:443"
-    depends_on:
-      - wordpress
-      - mariadb
-    volumes:
-      - wordpress_data:/var/www/html
-    networks:
-      - inception
-    restart: always
+      - mariadb:/var/lib/mysql                   #Persistant volume mounted on MariaDB data folder
+    restart: always                              #Restart if it stops or at system reboot
+
 
 volumes:
-  mariadb_data:
+  mariadb:
     driver: local
     driver_opts:
       type: none
-      device: /home/crocha-s/data/mariadb
+      device: /home/${USER_INCEPTION}/data/mariadb
       o: bind
-  wordpress_data:
-    driver: local
-    driver_opts:
-      device: /home/crocha-s/data/wp_db
-      o: bind
-      type: none
 
 networks:
   inception:
+    name: inception
     driver: bridge
