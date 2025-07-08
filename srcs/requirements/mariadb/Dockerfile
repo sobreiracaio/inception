@@ -10,7 +10,7 @@ RUN	apt-get update -y && \
 	apt-get install -y mariadb-server mariadb-client
 
 
-#Define arguments passed by docker compose file
+#Define enviroment variables passed by docker compose file
 
 ARG	MYSQL_DATABASE
 ARG	MYSQL_USER

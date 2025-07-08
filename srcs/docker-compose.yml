@@ -18,6 +18,45 @@ services:
       - mariadb:/var/lib/mysql                   #Persistant volume mounted on MariaDB data folder
     restart: always                              #Restart if it stops or at system reboot
 
+  wordpress:
+    container_name: wordpress
+    image: wordpress
+    init: true
+    build:
+      context: ./requirements/wordpress
+      args:
+        - MYSQL_DATABASE
+        - MYSQL_USER
+        - MYSQL_PASSWORD
+    networks:
+      - inception
+    volumes:
+      - wordpress:/var/www/html
+    restart: always
+    depends_on:
+      - mariadb
+
+  nginx:
+    container_name: nginx
+    image: nginx
+    init: true
+    build:
+      context: ./requirements/nginx
+      args:
+        - DOMAIN_NAME
+        - CERTS_KEY
+        - CERTS_CRT
+    networks:
+      - inception
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress:/var/www/html
+    restart: always
+    depends_on:
+      - mariadb
+      - wordpress
+
 
 volumes:
   mariadb:
@@ -26,6 +65,13 @@ volumes:
       type: none
       device: /home/${USER_INCEPTION}/data/mariadb
       o: bind
+  wordpress:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/${USER_INCEPTION}/data/wordpress
+      o: bind
+      
 
 networks:
   inception:
