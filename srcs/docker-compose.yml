@@ -17,6 +17,10 @@ services:
     volumes:
       - mariadb:/var/lib/mysql                   #Persistant volume mounted on MariaDB data folder
     restart: always                              #Restart if it stops or at system reboot
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
 
   wordpress:
     container_name: wordpress
@@ -34,7 +38,8 @@ services:
       - wordpress:/var/www/html
     restart: always
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
 
   nginx:
     container_name: nginx

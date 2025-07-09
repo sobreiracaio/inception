@@ -1,37 +1,54 @@
 #Base Image
-
 FROM debian:bullseye
 
-
-#Update/upgrade system and install mariaDB client, php-fpm(process manager for php), php-mysql(for communication mysql/mariadb) and wget(download files tool) components
-
+#Update/upgrade system and install components
 RUN	apt-get update -y && \
 	apt-get upgrade -y && \
-	apt-get install -y wget mariadb-client php7.4-fpm php7.4-mysql
-
+	apt-get install -y \
+		wget \
+		mariadb-client \
+		php7.4-fpm \
+		php7.4-mysql \
+		php7.4-mysqli \
+		php7.4-curl \
+		php7.4-gd \
+		php7.4-mbstring \
+		php7.4-xml \
+		php7.4-zip \
+		php7.4-json \
+		php7.4-intl \
+		php7.4-bcmath \
+		curl && \
+	rm -rf /var/lib/apt/lists/*
 
 #Setup PHP -> Nginx communication
+RUN mv /etc/php/7.4/fpm/pool.d/www.conf /etc/php/7.4/fpm/pool.d/www.conf.default
+COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d/
+RUN ln -s $(find /usr/sbin -name 'php-fpm*') /usr/bin/php-fpm
 
-RUN         mv /etc/php/7.4/fpm/pool.d/www.conf /etc/php/7.4/fpm/pool.d/www.conf.default   #Replaces default setup for a customized one
-COPY        ./conf/www.conf /etc/php/7.4/fpm/pool.d/
-RUN         ln -s $(find /usr/sbin -name 'php-fpm*') /usr/bin/php-fpm                      #creates a simbolic link just in case the php-fpm path is not in the $PATH
+#Create PID directory for PHP-FPM
+RUN mkdir -p /run/php
+RUN chmod 755 /run/php
 
+#Create WordPress directory
+RUN mkdir -p /var/www/html
+RUN chown -R www-data:www-data /var/www/html
 
-#Create PID directory for PHP-FPM (used to store de the PID file - its needed to run properly, if there is no pid folder php-fpm fails)
+#Define environment variables (these will be passed from docker-compose)
+ARG	MYSQL_DATABASE
+ARG	MYSQL_USER
+ARG	MYSQL_PASSWORD
 
-RUN         mkdir -p /run/php
-RUN         chmod 755 /run/php
+ENV	MYSQL_DATABASE=${MYSQL_DATABASE}
+ENV	MYSQL_USER=${MYSQL_USER}
+ENV	MYSQL_PASSWORD=${MYSQL_PASSWORD}
 
-#Wordpress init script
-
-COPY        ./tools/setup.sh /usr/local/bin/
-RUN         chmod 755 /usr/local/bin/setup.sh
+#WordPress init script
+COPY ./tools/setup.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/setup.sh
 
 #Expose Port
-
 EXPOSE 9000
 
-# Run php-fpm
-ENTRYPOINT  [ "bash", "/usr/local/bin/setup.sh" ]
-
-
+# Run setup script
+ENTRYPOINT [ "bash", "/usr/local/bin/setup.sh" ]

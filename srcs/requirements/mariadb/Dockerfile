@@ -17,16 +17,21 @@ ARG	MYSQL_USER
 ARG	MYSQL_PASSWORD
 ARG	MYSQL_ROOT_PASSWORD
 
+ENV	MYSQL_DATABASE=${MYSQL_DATABASE}
+ENV	MYSQL_USER=${MYSQL_USER}
+ENV	MYSQL_PASSWORD=${MYSQL_PASSWORD}
+ENV	MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+
 
 #Create essential folders and setup ownership and appropriate privilegies
 
 RUN	mkdir -p /var/lib/mysql
-RUN	mkdir -p /var/run/mysql	
-RUN	chown -R mysql:mysql /var/lib/mysql /var/run/mysql
-RUN	chmod 777 /var/run/mysql
+RUN	mkdir -p /var/run/mysqld	
+RUN	chown -R mysql:mysql /var/lib/mysql /var/run/mysqld
+RUN	chmod 777 /var/run/mysqld
 
 
-# Copy MariaDB conf file and and dump.sql file to the container
+# Copy MariaDB conf file to the container
 
 COPY	./conf/mariadb.cnf /etc/mysql/mariadb.conf.d/
 RUN	chmod 644 /etc/mysql/mariadb.conf.d/mariadb.cnf
@@ -35,6 +40,7 @@ RUN	chmod 644 /etc/mysql/mariadb.conf.d/mariadb.cnf
 #MariaDB init script
 
 COPY	./tools/setup.sh /usr/local/bin/
+RUN	chmod +x /usr/local/bin/setup.sh
 RUN	bash /usr/local/bin/setup.sh
 
 
