@@ -20,7 +20,7 @@ RESET = \033[0m
 #YML file folder
 DOCKER_COMPOSE = ./srcs/docker-compose.yml
 
-all: hosts up
+all: setup_dirs hosts up
 	@echo "\n"
 	@echo "${RESET}##############################################################################${NC}"
 	@echo "${BLUE}#               ${NAME} is up and running for user:${YELLOW} ${USER}${BLUE}               #${RESET}"
@@ -41,6 +41,15 @@ up:
 	@echo "${BLUE} Starting docker compose... ${RESET}"
 	sudo docker compose -f $(DOCKER_COMPOSE) up -d --build
 	@echo "${BLUE}Docker compose up and running ${RESET}"
+
+setup_dirs:
+	@echo "${BLUE}Creating volume directories...${RESET}"
+	sudo mkdir -p /home/${USER}/data/mariadb
+	sudo mkdir -p /home/${USER}/data/wordpress
+
+	
+	@echo "${GREEN}Directories created and ownership set.${RESET}"
+
 down:
 	@echo "${YELLOW} Stopping docker compose... ${RESET}"
 	@docker compose -f $(DOCKER_COMPOSE) down

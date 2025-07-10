@@ -11,13 +11,13 @@ fi
 
 echo "Setting up WordPress..."
 
-# Waiting MariaDB
+# Aguardar MariaDB
 echo "Waiting for MariaDB..."
 until mysqladmin ping -h mariadb -u $MYSQL_USER -p$MYSQL_PASSWORD --silent; do
     echo "Waiting MariaDB to be ready..."
     sleep 3
 done
-echo "MariaDB ready!"
+echo "MariaDB pronto!"
 
 # Download WordPress if it doesn't exist
 if [ ! -f "$WP_PATH/index.php" ]; then

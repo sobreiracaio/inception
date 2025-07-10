@@ -16,7 +16,9 @@ ARG	MYSQL_DATABASE
 ARG	MYSQL_USER
 ARG	MYSQL_PASSWORD
 ARG	MYSQL_ROOT_PASSWORD
+ARG	USER_INCEPTION
 
+ENV	USER_INCEPTION=${USER_INCEPTION}
 ENV	MYSQL_DATABASE=${MYSQL_DATABASE}
 ENV	MYSQL_USER=${MYSQL_USER}
 ENV	MYSQL_PASSWORD=${MYSQL_PASSWORD}
@@ -35,6 +37,11 @@ RUN	chmod 777 /var/run/mysqld
 
 COPY	./conf/mariadb.cnf /etc/mysql/mariadb.conf.d/
 RUN	chmod 644 /etc/mysql/mariadb.conf.d/mariadb.cnf
+RUN	mkdir -p /home/${USER_INCEPTION}/data/mariadb
+RUN	mkdir -p /home/${USER_INCEPTION}/data/wordpress
+RUN	chmod 755 /home/${USER_INCEPTION}/data/mariadb
+RUN	chmod 755 /home/${USER_INCEPTION}/data/wordpress
+
 
 
 #MariaDB init script
