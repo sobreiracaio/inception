@@ -11,6 +11,10 @@ fi
 
 echo "Setting up WordPress..."
 
+# Reading from secrets
+MYSQL_USER=$(cat /run/secrets/mysql_user)
+MYSQL_PASSWORD=$(cat /run/secrets/mysql_password)
+
 # Aguardar MariaDB
 echo "Waiting for MariaDB..."
 until mysqladmin ping -h mariadb -u $MYSQL_USER -p$MYSQL_PASSWORD --silent; do

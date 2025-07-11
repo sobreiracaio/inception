@@ -38,12 +38,8 @@ RUN	chmod 755 /home/${USER_INCEPTION}/data/wordpress
 
 #Define environment variables (these will be passed from docker-compose)
 ARG	MYSQL_DATABASE
-ARG	MYSQL_USER
-ARG	MYSQL_PASSWORD
 
 ENV	MYSQL_DATABASE=${MYSQL_DATABASE}
-ENV	MYSQL_USER=${MYSQL_USER}
-ENV	MYSQL_PASSWORD=${MYSQL_PASSWORD}
 
 #WordPress init script
 COPY ./tools/setup.sh /usr/local/bin/

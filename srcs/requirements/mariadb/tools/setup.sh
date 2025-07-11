@@ -8,6 +8,11 @@ while ! mysqladmin ping -h localhost --silent; do
     sleep 2
 done
 
+# Reading data from secrets
+MYSQL_USER=$(cat /run/secrets/mysql_user)
+MYSQL_PASSWORD=$(cat /run/secrets/mysql_password)
+MYSQL_ROOT_PASSWORD=$(cat /run/secrets/mysql_root_password)
+
 # WP database - creation and import
 mysql -u root -e "
     CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};

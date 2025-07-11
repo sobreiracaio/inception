@@ -13,17 +13,10 @@ RUN	apt-get update -y && \
 #Define enviroment variables passed by docker compose file
 
 ARG	MYSQL_DATABASE
-ARG	MYSQL_USER
-ARG	MYSQL_PASSWORD
-ARG	MYSQL_ROOT_PASSWORD
 ARG	USER_INCEPTION
 
 ENV	USER_INCEPTION=${USER_INCEPTION}
 ENV	MYSQL_DATABASE=${MYSQL_DATABASE}
-ENV	MYSQL_USER=${MYSQL_USER}
-ENV	MYSQL_PASSWORD=${MYSQL_PASSWORD}
-ENV	MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-
 
 #Create essential folders and setup ownership and appropriate privilegies
 
