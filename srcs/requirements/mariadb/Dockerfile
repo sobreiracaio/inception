@@ -38,9 +38,8 @@ RUN	chmod 777 /var/run/mysqld
 COPY	./conf/mariadb.cnf /etc/mysql/mariadb.conf.d/
 RUN	chmod 644 /etc/mysql/mariadb.conf.d/mariadb.cnf
 RUN	mkdir -p /home/${USER_INCEPTION}/data/mariadb
-RUN	mkdir -p /home/${USER_INCEPTION}/data/wordpress
 RUN	chmod 755 /home/${USER_INCEPTION}/data/mariadb
-RUN	chmod 755 /home/${USER_INCEPTION}/data/wordpress
+
 
 
 

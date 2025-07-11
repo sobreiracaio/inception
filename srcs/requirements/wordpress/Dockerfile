@@ -33,6 +33,8 @@ RUN chmod 755 /run/php
 #Create WordPress directory
 RUN mkdir -p /var/www/html
 RUN chown -R www-data:www-data /var/www/html
+RUN	mkdir -p /home/${USER_INCEPTION}/data/wordpress
+RUN	chmod 755 /home/${USER_INCEPTION}/data/wordpress
 
 #Define environment variables (these will be passed from docker-compose)
 ARG	MYSQL_DATABASE
