@@ -2,7 +2,7 @@
 
 WP_PATH=/var/www/html
 SETUP_FLAG="/tmp/wp_setup_done"
-
+DOMAIN_NAME="crocha-s.42.fr"
 # If already configured, just start php-fpm
 if [ -f "$SETUP_FLAG" ]; then
     echo "WordPress already configured, initializing php-fpm..."
@@ -14,8 +14,12 @@ echo "Setting up WordPress..."
 # Reading from secrets
 MYSQL_USER=$(cat /run/secrets/mysql_user)
 MYSQL_PASSWORD=$(cat /run/secrets/mysql_password)
+WP_USER=$(cat /run/secrets/wp_user)
+WP_ADMIN=$(cat /run/secrets/wp_admin_user)
+WP_USER_PASS=$(cat /run/secrets/wp_user_password)
+WP_ADMIN_PASS=$(cat /run/secrets/wp_admin_password)
 
-# Aguardar MariaDB
+# Waiting MariaDB
 echo "Waiting for MariaDB..."
 until mysqladmin ping -h mariadb -u $MYSQL_USER -p$MYSQL_PASSWORD --silent; do
     echo "Waiting MariaDB to be ready..."
@@ -65,7 +69,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once ABSPATH . 'wp-settings.php';
 EOF
 
-chown www-data:www-data $WP_PATH/wp-config.php
+chown -R www-data:www-data $WP_PATH
+chmod -R 755 $WP_PATH
 
 # Testing connection
 echo "Testing connection with DataBase..."
@@ -80,9 +85,56 @@ if (\$link) {
 }
 "
 
+# Change to WordPress directory for WP-CLI commands
+cd $WP_PATH
+
+# Check if WordPress is already installed
+if ! wp core is-installed --allow-root 2>/dev/null; then
+    echo "Installing WordPress core..."
+    
+    # Install WordPress core (creates database tables and initial setup)
+    wp core install \
+        --url="https://${DOMAIN_NAME}" \
+        --title="Inception" \
+        --admin_user="$WP_ADMIN" \
+        --admin_password="$WP_ADMIN_PASS" \
+        --admin_email="theboss@example.com" \
+        --allow-root
+    
+    echo "WordPress core installed successfully!"
+    
+    # Create additional user (non-admin)
+    echo "Creating additional user..."
+    wp user create "$WP_USER" "user@example.com" \
+        --user_pass="$WP_USER_PASS" \
+        --role=author \
+        --allow-root
+    
+    echo "Additional user created successfully!"
+    
+    # Optional: Create some sample content
+    echo "Creating sample content..."
+    wp post create \
+        --post_title="Welcome to Inception Site" \
+        --post_content="This is your first post. You can edit or delete it to get started with your website." \
+        --post_status=publish \
+        --allow-root
+    
+    echo "Sample content created!"
+    
+else
+    echo "WordPress is already installed, skipping installation..."
+fi
+
+# Ensure proper permissions
+chown -R www-data:www-data $WP_PATH
+chmod -R 755 $WP_PATH
+
 # Mark as concluded
 touch "$SETUP_FLAG"
 
 echo "WordPress successfully setup!"
+echo "Admin user: $WP_ADMIN"
+echo "Regular user: $WP_USER"
 echo "Initializing php-fpm..."
 exec php-fpm -F

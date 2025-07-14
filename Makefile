@@ -20,14 +20,20 @@ RESET = \033[0m
 #YML file folder
 DOCKER_COMPOSE = ./srcs/docker-compose.yml
 
-all: hosts up
+all: setup_dirs hosts up
 	@echo "\n"
 	@echo "${RESET}##############################################################################${NC}"
 	@echo "${BLUE}#               ${NAME} is up and running for user:${YELLOW} ${USER}${BLUE}               #${RESET}"
 	@echo "${BLUE}#               Wordpress runs at:${YELLOW} ${USER}.42.fr ${BLUE}                           #${RESET}"
 	@echo "${BLUE}#              For admin access go to:${YELLOW} ${USER}.42.fr/wp-admin ${BLUE}              #${RESET}"
 	@echo "${RESET}##############################################################################${NC}"
-	
+
+setup_dirs:
+	sudo mkdir -p /home/$(USER)/data/mariadb
+	sudo mkdir -p /home/$(USER)/data/wordpress
+	sudo chmod 777 /home/$(USER)/data/mariadb
+	sudo chmod 777 /home/$(USER)/data/wordpress  	
+		
 
 hosts:
 	@echo "\n"
@@ -53,11 +59,12 @@ clean: down
 	docker volume rm ${WP_VOL}
 	docker volume rm ${MDB_VOL}
 	sudo sed -i '/127\.0\.0\.1\t${USER}\.42\.fr/d' /etc/hosts
+	sudo rm -rf /home/$(USER)
 	@echo "${RED}Docker volumes and domain removed!${RESET}"
 
 re: down all
 
-prepare: update compose
+prepare: update
 
 update:
 	@echo "${BLUE}Updating System${RESET}"
@@ -75,16 +82,6 @@ update:
 				echo "${RED}System update failed${RESET}"; \
 			fi
 
-
-compose: 
-	@echo "${BLUE}Updating Docker Compose${RESET}"
-	sudo apt -y install curl
-	mkdir -p ${DOCKER_CONFIG}/cli-plugins
-	curl -SL https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-x86_64 -o ${DOCKER_CONFIG}/cli-plugins/docker-compose
-	chmod +x ${DOCKER_CONFIG}/cli-plugins/docker-compose
-	sudo mkdir -p /usr/local/lib/docker/cli-plugins
-	sudo mv /home/${SYSTEM_USER}/.docker/cli-plugins/docker-compose /usr/local/lib/docker/cli-plugins/docker-compose
-	@echo "${GREEN}Docker Compose updated${RESET}"
 
 PHONY:	all clean re prepare
 

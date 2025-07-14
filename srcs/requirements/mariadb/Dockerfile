@@ -40,7 +40,6 @@ RUN	chmod 755 /home/${USER_INCEPTION}/data/mariadb
 
 COPY	./tools/setup.sh /usr/local/bin/
 RUN	chmod +x /usr/local/bin/setup.sh
-RUN	bash /usr/local/bin/setup.sh
 
 
 #Port Expose to the host
@@ -50,4 +49,4 @@ EXPOSE 3306
 
 #Run MariaDB
 
-ENTRYPOINT ["mysqld_safe"]
+ENTRYPOINT ["bash", "/usr/local/bin/setup.sh" ]
