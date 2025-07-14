@@ -28,15 +28,17 @@ done
 echo "MariaDB pronto!"
 
 # Download WordPress if it doesn't exist
+WP_VERSION=6.5.3
 if [ ! -f "$WP_PATH/index.php" ]; then
-    echo "Downloading WordPress..."
-    wget -q https://wordpress.org/latest.tar.gz
-    tar -xzf latest.tar.gz
+    echo "Downloading WordPress $WP_VERSION..."
+    wget -q https://wordpress.org/wordpress-$WP_VERSION.tar.gz
+    tar -xzf wordpress-$WP_VERSION.tar.gz
     mkdir -p $WP_PATH
     cp -r wordpress/* $WP_PATH/
-    rm -rf wordpress latest.tar.gz
+    rm -rf wordpress wordpress-$WP_VERSION.tar.gz
     chown -R www-data:www-data $WP_PATH
 fi
+
 
 # Creating wp-config.php
 echo "Creating wp-config.php..."
