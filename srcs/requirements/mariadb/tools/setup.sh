@@ -18,36 +18,25 @@ WP_USER_PASS=$(cat /run/secrets/wp_user_password)
 WP_ADMIN_PASS=$(cat /run/secrets/wp_admin_password)
 
 
-# Primeiro acesso sem senha (funciona só porque ainda não tem senha definida)
+# WP database - creation and import
 mysql -u root -e "
     CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};
     CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
-    GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';
+    GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%' INDENTIFIED BY '${MYSQL_PASSWORD}';
     FLUSH PRIVILEGES;
 "
 
-# Agora definimos a senha para o usuário root (localhost apenas)
-mysql -u root -e "
-    ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-    FLUSH PRIVILEGES;
-"
+# Set Password for root user
+mysql -u root -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$MYSQL_ROOT_PASSWORD');"
+mysql -u root -e "FLUSH PRIVILEGES;"
 
-# Reforça o acesso do root apenas localmente (evita login remoto sem senha)
-mysql -u root -p"${MYSQL_ROOT_PASSWORD}" -e "
-    REVOKE ALL PRIVILEGES, GRANT OPTION FROM 'root'@'%';
-    FLUSH PRIVILEGES;
-"
+# Allow root user to login from any host
+mysql -u root -p $MYSQL_ROOT_PASSWORD -e "GRANT ALL ON *.* TO 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';"
+mysql -u root -p $MYSQL_ROOT_PASSWORD -e "FLUSH PRIVILEGES;"
 
-# Opcional: bloquear totalmente acesso remoto de root (boa prática)
-mysql -u root -p"${MYSQL_ROOT_PASSWORD}" -e "
-    DELETE FROM mysql.user WHERE user='root' AND host NOT IN ('localhost');
-    FLUSH PRIVILEGES;
-"
-
-# Finaliza a configuração
 service mariadb stop
-exec mysqld_safe
 
+mysqld_safe
 
 
 
