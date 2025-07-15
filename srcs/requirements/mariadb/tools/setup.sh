@@ -12,10 +12,6 @@ done
 MYSQL_USER=$(cat /run/secrets/mysql_user)
 MYSQL_PASSWORD=$(cat /run/secrets/mysql_password)
 MYSQL_ROOT_PASSWORD=$(cat /run/secrets/mysql_root_password)
-WP_USER=$(cat /run/secrets/wp_user)
-WP_ADMIN=$(cat /run/secrets/wp_admin_user)
-WP_USER_PASS=$(cat /run/secrets/wp_user_password)
-WP_ADMIN_PASS=$(cat /run/secrets/wp_admin_password)
 
 # Create database and user
 mysql -u root -e "
