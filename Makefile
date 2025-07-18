@@ -1,5 +1,5 @@
 NAME		= Inception
-USER		= crocha-s
+USER		= userlogin
 
 
 DOCKER_CONFIG 	= $(shell echo $$HOME/.docker)

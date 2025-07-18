@@ -2,7 +2,7 @@
 
 WP_PATH=/var/www/html
 SETUP_FLAG="/tmp/wp_setup_done"
-DOMAIN_NAME="crocha-s.42.fr"
+DOMAIN_NAME="userlogin.42.fr"
 # If already configured, just start php-fpm
 if [ -f "$SETUP_FLAG" ]; then
     echo "WordPress already configured, initializing php-fpm..."

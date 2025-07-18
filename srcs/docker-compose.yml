@@ -93,13 +93,13 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /home/crocha-s/data/mariadb
+      device: /home/userlogin/data/mariadb
       o: bind
   wordpress:
     driver: local
     driver_opts:
       type: none
-      device: /home/crocha-s/data/wordpress
+      device: /home/userlogin/data/wordpress
       o: bind
       
 
